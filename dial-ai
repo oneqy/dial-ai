@@ -1,0 +1,86 @@
+here<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dial AI | Powered by Groq</title>
+    <style>
+        /* تصميم ضياء المميز */
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .chat-container { width: 100%; max-width: 450px; height: 90vh; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .chat-header { background: #f55c33; color: white; padding: 20px; text-align: center; border-radius: 20px 20px 0 0; }
+        .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: #fafafa; }
+        .message { padding: 12px 16px; border-radius: 15px; max-width: 80%; font-size: 15px; }
+        .user { background: #f55c33; color: white; align-self: flex-end; }
+        .bot { background: #eeeeee; color: #333; align-self: flex-start; }
+        .chat-input { padding: 15px; display: flex; gap: 10px; border-top: 1px solid #eee; }
+        input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; outline: none; }
+        button { background: #f55c33; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">
+        <h2>Dial AI</h2>
+        <p>تطوير ضياء | سريع جداً عبر Groq</p>
+    </div>
+    <div class="chat-box" id="chatBox">
+        <div class="message bot">أهلاً ضياء! أنا Dial، أعمل الآن عبر محرك Groq الخارق. كيف يمكنني مساعدتك؟</div>
+    </div>
+    <div class="chat-input">
+        <input type="text" id="userInput" placeholder="اكتب سؤالك هنا..." onkeypress="if(event.key==='Enter') sendMessage()">
+        <button onclick="sendMessage()">إرسال</button>
+    </div>
+</div>
+
+<script>
+    // مفتاح Groq الخاص بك يا ضياء
+    const API_KEY = "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";
+    const API_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+    async function sendMessage() {
+        const inputField = document.getElementById("userInput");
+        const userText = inputField.value.trim();
+        if (!userText) return;
+
+        appendMessage("user", userText);
+        inputField.value = "";
+
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${API_KEY}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: "llama3-8b-8192", // موديل سريع وذكي جداً
+                    messages: [
+                        { role: "system", content: "أنت Dial، مساعد ذكاء اصطناعي طورك ضياء. ردودك ذكية، سريعة، وباللغة العربية." },
+                        { role: "user", content: userText }
+                    ]
+                })
+            });
+
+            const data = await response.json();
+            const dialReply = data.choices[0].message.content;
+            appendMessage("bot", dialReply);
+        } catch (error) {
+            appendMessage("bot", "خطأ في الاتصال. تأكد من تشغيل الموقع عبر رابط (Netlify) وليس كملف محلي.");
+            console.error("Error:", error);
+        }
+    }
+
+    function appendMessage(sender, text) {
+        const chatBox = document.getElementById("chatBox");
+        const msgDiv = document.createElement("div");
+        msgDiv.className = `message ${sender}`;
+        msgDiv.innerText = text;
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
